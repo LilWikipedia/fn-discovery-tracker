@@ -1,4 +1,14 @@
 import ExperienceGrid from "@/components/ExperienceGrid";
+import { createClient } from '@supabase/supabase-js';
+import express from 'express';
+import cron from 'node-cron';
+import { fetchHtml } from './src/components/FetchHtml.tsx';
+import { geminiParse } from './src/components/GeminiParse.tsx';
+
+const supabaseUrl = 'your-supabase-url';
+const supabaseKey = 'your-supabase-key';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 
 const Index = () => {
   return (
@@ -15,5 +25,26 @@ const Index = () => {
     </div>
   );
 };
+const app = express();
+cron.schedule('* * * * *', async () => { 
+  try {
+      const html = await fetchHtml('your-website.com');
+      const extractedData = await geminiParse(html);
+
+      const { error } = await supabase
+          .from('fn-discovery')
+          .insert(extractedData);
+
+      if (error) {
+          console.error('Error inserting data into Supabase:', error);
+      } else {
+          console.log('Data inserted into Supabase successfully!');
+      }
+  } catch (error) {
+      console.error('Error in main process:', error);
+  }
+});
+
+app.listen(3000, () => console.log('Server started')); 
 
 export default Index;
