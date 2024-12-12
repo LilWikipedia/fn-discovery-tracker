@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { useDiscoveryData } from '@/hooks/useDiscoveryData';
 
 interface Experience {
   id: string;
@@ -10,15 +11,8 @@ interface Experience {
   lastUpdated: string;
 }
 
-const mockData: Experience[] = [
-  { id: '1', name: 'Battle Royale X', category: 'Action', ccu: 1250, lastUpdated: '2024-02-20 15:30' },
-  { id: '2', name: 'Creative Hub', category: 'Creative', ccu: 890, lastUpdated: '2024-02-20 15:30' },
-  { id: '3', name: 'Zombie Defense', category: 'Survival', ccu: 2100, lastUpdated: '2024-02-20 15:30' },
-  { id: '4', name: 'Racing Masters', category: 'Racing', ccu: 750, lastUpdated: '2024-02-20 15:30' },
-  { id: '5', name: 'Build Wars', category: 'Creative', ccu: 1600, lastUpdated: '2024-02-20 15:30' },
-];
-
 const ExperienceGrid = () => {
+  const { data: discordData, isLoading, error } = useDiscoveryData();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Experience;
@@ -32,8 +26,24 @@ const ExperienceGrid = () => {
     }));
   };
 
+  // Transform Discord data into Experience format
+  const experiences: Experience[] = useMemo(() => {
+    if (!discordData) return [];
+    
+    return discordData.map((item, index) => {
+      // You'll need to implement proper parsing logic here based on your Discord message format
+      return {
+        id: index.toString(),
+        name: 'Parse from content', // Parse from item.content
+        category: 'Parse from content', // Parse from item.content
+        ccu: 0, // Parse from item.content
+        lastUpdated: item.timestamp
+      };
+    });
+  }, [discordData]);
+
   const sortedData = useMemo(() => {
-    let filtered = [...mockData];
+    let filtered = [...experiences];
     
     if (searchTerm) {
       filtered = filtered.filter(item =>
@@ -56,7 +66,15 @@ const ExperienceGrid = () => {
     }
 
     return filtered;
-  }, [mockData, searchTerm, sortConfig]);
+  }, [experiences, searchTerm, sortConfig]);
+
+  if (isLoading) {
+    return <div className="container mx-auto p-4">Loading discovery data...</div>;
+  }
+
+  if (error) {
+    return <div className="container mx-auto p-4 text-red-500">Error loading discovery data: {error.message}</div>;
+  }
 
   return (
     <div className="container mx-auto p-4">
@@ -75,6 +93,7 @@ const ExperienceGrid = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-secondary">
+
               <th 
                 className="grid-header cursor-pointer"
                 onClick={() => handleSort('name')}
