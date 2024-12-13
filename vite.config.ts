@@ -3,19 +3,23 @@ import path from "path";
 import { defineConfig } from "vite";
 
 export default defineConfig(({ mode }) => ({
-  plugins: [react()].filter(Boolean),
+  plugins: [react()],
   base: '/fn-discovery-tracker/',
   server: {
     host: "::",
-    port: 8080, 
+    port: 8080,
     proxy: {
-      '/api': {target: 'http://localhost:3001', changeOrigin: true}
-      
-    
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true, // Add this for better proxy handling
+        secure: false // Add this if working with development certificates
+      }
+    }
   },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-    },
+    }
   }
-}}));
+}));
+
