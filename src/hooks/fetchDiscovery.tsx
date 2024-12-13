@@ -1,7 +1,7 @@
 import { Client, IntentsBitField, TextChannel } from 'discord.js';
+import 'dotenv/config';
 import * as fs from 'fs';
 import * as path from 'path';
-import 'dotenv/config';
 
 
 // Discord bot token
@@ -51,7 +51,8 @@ async function exportChannelMessages(channel: TextChannel) {
 
     // Create a filename with the channel name and current date
     const filename = `${channel.name}-${new Date().toISOString().slice(0, 10)}.json`;
-    const filePath = path.join(__dirname, 'exports', filename);
+    const filePath = path.join(__dirname, '..', 'src', 'exports', filename);
+      await fs.promises.mkdir(path.join(__dirname, '..', 'src', 'exports'), { recursive: true });
 
     // Write the messages to a JSON file
     fs.writeFileSync(filePath, JSON.stringify(formattedMessages, null, 2));
