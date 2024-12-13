@@ -5,9 +5,9 @@ import { useDiscoveryData } from '@/hooks/useDiscoveryData';
 
 interface Experience {
   id: string;
-  name: string;
-  category: string;
-  ccu: number;
+  author: string;
+  content: string;
+  timestamp: number;
   lastUpdated: string;
 }
 
@@ -34,9 +34,9 @@ const ExperienceGrid = () => {
       // You'll need to implement proper parsing logic here based on your Discord message format
       return {
         id: index.toString(),
-        name: 'Parse from content', // Parse from item.content
-        category: 'Parse from content', // Parse from item.content
-        ccu: 0, // Parse from item.content
+        author: 'Parse from content', // Parse from item.content
+        content: 'Parse from content', // Parse from item.content
+        timestamp: 0, // Parse from item.content
         lastUpdated: item.timestamp
       };
     });
@@ -82,7 +82,7 @@ const ExperienceGrid = () => {
         <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
           type="text"
-          placeholder="Search experiences..."
+          placeholder="Search Discovery..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="search-input pl-10"
@@ -96,21 +96,21 @@ const ExperienceGrid = () => {
 
               <th 
                 className="grid-header cursor-pointer"
-                onClick={() => handleSort('name')}
+                onClick={() => handleSort('author')}
               >
-                Name
+                author
               </th>
               <th 
                 className="grid-header cursor-pointer"
-                onClick={() => handleSort('category')}
+                onClick={() => handleSort('content')}
               >
-                Category
+                content
               </th>
               <th 
                 className="grid-header cursor-pointer text-right"
-                onClick={() => handleSort('ccu')}
+                onClick={() => handleSort('timestamp')}
               >
-                CCU
+                timestamp
               </th>
               <th 
                 className="grid-header cursor-pointer"
@@ -123,9 +123,9 @@ const ExperienceGrid = () => {
           <tbody>
             {sortedData.map((experience) => (
               <tr key={experience.id} className="hover:bg-muted/50 transition-colors">
-                <td className="grid-cell">{experience.name}</td>
-                <td className="grid-cell">{experience.category}</td>
-                <td className="grid-cell text-right font-mono">{experience.ccu.toLocaleString()}</td>
+                <td className="grid-cell">{experience.author}</td>
+                <td className="grid-cell">{experience.content}</td>
+                <td className="grid-cell text-right font-mono">{experience.timestamp.toLocaleString()}</td>
                 <td className="grid-cell font-mono">{experience.lastUpdated}</td>
               </tr>
             ))}
