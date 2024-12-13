@@ -7,10 +7,11 @@ export default defineConfig(({ mode }) => ({
   base: '/fn-discovery-tracker/',
   server: {
     host: "::",
-    port: 8080,
+    port: 8080, 
     proxy: {
-      '/api': 'http://localhost:3001',
-    }
+      '/api': {target: 'http://localhost:3001', changeOrigin: true}
+      
+    
   },
   resolve: {
     alias: {
