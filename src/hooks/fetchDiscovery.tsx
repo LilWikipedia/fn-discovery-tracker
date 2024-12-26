@@ -1,105 +1,65 @@
-import { Client, IntentsBitField, TextChannel } from 'discord.js';
-import 'dotenv/config';
-import * as fs from 'fs';
-import * as path from 'path';
+/* eslint-disable react-hooks/rules-of-hooks */
+import axios from 'axios';
+import { JSDOM } from 'jsdom';
+import { useEffect, useState } from 'react';
 
-
-// Discord bot token
-
-const token = process.env.DISCORD_BOT_TOKEN;
-
-
-const serverId = '944370728675991584';
-const channelId = '946913692954525736';
-
-
-const client = new Client({
-  intents: [
-    IntentsBitField.Flags.Guilds,
-    IntentsBitField.Flags.MessageContent,
-  ],
-});
-
-client.once('ready', async () => {
-  console.log('Bot is ready!');
-
-  // Fetch the channel
-  const channel = client.channels.cache.get(channelId) as TextChannel;
-  if (!channel) {
-    console.error('Channel not found!');
-    return;
-  }
-
-  // Schedule the export function
-  scheduleExport(channel);
-});
-
-/**
- * Fetches and exports messages from a channel to a file.
- * @param channel The Discord channel to export messages from.
- */
-async function exportChannelMessages(channel: TextChannel) {
-  try {
-    const messages = await fetchAllMessages(channel);
-
-    // Format the messages
-    const formattedMessages = messages.map((msg) => ({
-      author: msg.author.username,
-      content: msg.content,
-      timestamp: msg.createdAt.toISOString(),
-    }));
-
-    // Create a filename with the channel name and current date
-    const filename = `${channel.name}-${new Date().toISOString().slice(0, 10)}.json`;
-    const filePath = path.join(__dirname, '..', 'src', 'exports', filename);
-      await fs.promises.mkdir(path.join(__dirname, '..', 'src', 'exports'), { recursive: true });
-
-    // Write the messages to a JSON file
-    fs.writeFileSync(filePath, JSON.stringify(formattedMessages, null, 2));
-    console.log(`Messages exported to ${filePath}`);
-  } catch (error) {
-    console.error('Error exporting messages:', error);
-  }
+interface Experience {
+  id: string;
+  islandcode: string;
+  islandtitle: string;
+  players: number;
+  lastUpdated: string;
 }
 
-/**
- * Fetches all messages from a channel.
- * @param channel The Discord channel to fetch messages from.
- * @returns An array of messages.
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function fetchAllMessages(channel: TextChannel): Promise<any[]> {
-  let messages = [];
-  let lastId;
-
-  while (true) {
-    const fetchedMessages = await channel.messages.fetch({
-      limit: 100,
-      ...(lastId && { before: lastId }),
-    });
-
-    if (fetchedMessages.size === 0) {
-      break;
-    }
-
-    messages = messages.concat(Array.from(fetchedMessages.values()));
-    lastId = fetchedMessages.lastKey();
-  }
-
-  return messages;
+interface FetchDiscoveryResult {
+  data: Experience[] | null;
+  isLoading: boolean;
+  error: Error | null;
 }
 
-/**
- * Schedules the export function to run at a specified interval.
- * @param channel The Discord channel to export.
- */
-function scheduleExport(channel: TextChannel) {
-  // Schedule the export to run daily at midnight (0 0 * * *)
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const cron = require('node-cron');
-  cron.schedule('0 0 * * *', () => {
-    exportChannelMessages(channel);
-  });
-}
+export function fetchDiscovery(): FetchDiscoveryResult {
+  const [data, setData] = useState<Experience[] | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
 
-client.login(token);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('https://fortnite.gg/discover');
+        const html = response.data;
+        const dom = new JSDOM(html);
+        const document = dom.window.document;
+
+        const experiences: Experience[] = [];
+        const islandElements = document.querySelectorAll('a[href^="/island?code="]');
+        
+        islandElements.forEach((element, index) => {
+          const islandcode = element.getAttribute('href')?.split('=')[1] || '';
+          const islandtitle = element.querySelector('.island-title')?.textContent?.trim() || '';
+          const playersElement = element.querySelector('.players');
+          const playersText = playersElement?.textContent?.trim() || '0';
+          const players = parseInt(playersText.replace(/,/g, ''), 10);
+          const lastUpdated = new Date().toISOString(); // Since the actual last updated isn't available in the HTML
+
+          experiences.push({
+            id: String(index),
+            islandcode,
+            islandtitle,
+            players: isNaN(players) ? 0 : players,
+            lastUpdated
+          });
+        });
+
+        setData(experiences);
+        setIsLoading(false);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Failed to fetch discovery data'));
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  return { data, isLoading, error };
+}

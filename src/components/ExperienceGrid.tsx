@@ -1,18 +1,19 @@
-import React, { useState, useMemo } from 'react';
 import { Input } from "@/components/ui/input";
+import { fetchDiscovery } from "@/hooks/fetchDiscovery";
 import { Search } from "lucide-react";
-import { useDiscoveryData } from '@/hooks/useDiscoveryData';
+import { useMemo, useState } from 'react';
+
 
 interface Experience {
   id: string;
-  author: string;
-  content: string;
-  timestamp: number;
+  islandcode: string;
+  islandtitle: string;
+  players: number;
   lastUpdated: string;
 }
 
 const ExperienceGrid = () => {
-  const { data: discordData, isLoading, error } = useDiscoveryData();
+  const { data: DiscoveryData, isLoading, error } = fetchDiscovery();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Experience;
@@ -26,24 +27,9 @@ const ExperienceGrid = () => {
     }));
   };
 
-  // Transform Discord data into Experience format
-  const experiences: Experience[] = useMemo(() => {
-    if (!discordData) return [];
-    
-    return discordData.map((item, index) => {
-      // You'll need to implement proper parsing logic here based on your Discord message format
-      return {
-        id: index.toString(),
-        author: 'Parse from content', // Parse from item.content
-        content: 'Parse from content', // Parse from item.content
-        timestamp: 0, // Parse from item.content
-        lastUpdated: item.timestamp
-      };
-    });
-  }, [discordData]);
 
   const sortedData = useMemo(() => {
-    let filtered = [...experiences];
+    let filtered = [];
     
     if (searchTerm) {
       filtered = filtered.filter(item =>
@@ -66,7 +52,7 @@ const ExperienceGrid = () => {
     }
 
     return filtered;
-  }, [experiences, searchTerm, sortConfig]);
+  }, [searchTerm, sortConfig]);
 
   if (isLoading) {
     return <div className="container mx-auto p-4">Loading discovery data...</div>;
@@ -96,21 +82,21 @@ const ExperienceGrid = () => {
 
               <th 
                 className="grid-header cursor-pointer"
-                onClick={() => handleSort('author')}
+                onClick={() => handleSort('islandcode')}
               >
-                author
+                islandcode
               </th>
               <th 
                 className="grid-header cursor-pointer"
-                onClick={() => handleSort('content')}
+                onClick={() => handleSort('islandtitle')}
               >
-                content
+                islandtitle
               </th>
               <th 
                 className="grid-header cursor-pointer text-right"
-                onClick={() => handleSort('timestamp')}
+                onClick={() => handleSort('players')}
               >
-                timestamp
+                players
               </th>
               <th 
                 className="grid-header cursor-pointer"
@@ -123,9 +109,9 @@ const ExperienceGrid = () => {
           <tbody>
             {sortedData.map((experience) => (
               <tr key={experience.id} className="hover:bg-muted/50 transition-colors">
-                <td className="grid-cell">{experience.author}</td>
-                <td className="grid-cell">{experience.content}</td>
-                <td className="grid-cell text-right font-mono">{experience.timestamp.toLocaleString()}</td>
+                <td className="grid-cell">{experience.islandcode}</td>
+                <td className="grid-cell">{experience.islandtitle}</td>
+                <td className="grid-cell text-right font-mono">{experience.players.toLocaleString()}</td>
                 <td className="grid-cell font-mono">{experience.lastUpdated}</td>
               </tr>
             ))}
