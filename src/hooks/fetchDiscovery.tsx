@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/rules-of-hooks */
+
 import axios from 'axios';
 import { JSDOM } from 'jsdom';
 import { useEffect, useState } from 'react';
@@ -17,7 +17,7 @@ interface FetchDiscoveryResult {
   error: Error | null;
 }
 
-export function fetchDiscovery(): FetchDiscoveryResult {
+export function useFetchDiscovery(): FetchDiscoveryResult {
   const [data, setData] = useState<Experience[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
@@ -32,14 +32,14 @@ export function fetchDiscovery(): FetchDiscoveryResult {
 
         const experiences: Experience[] = [];
         const islandElements = document.querySelectorAll('a[href^="/island?code="]');
-        
+
         islandElements.forEach((element, index) => {
           const islandcode = element.getAttribute('href')?.split('=')[1] || '';
           const islandtitle = element.querySelector('.island-title')?.textContent?.trim() || '';
           const playersElement = element.querySelector('.players');
           const playersText = playersElement?.textContent?.trim() || '0';
           const players = parseInt(playersText.replace(/,/g, ''), 10);
-          const lastUpdated = new Date().toISOString(); // Since the actual last updated isn't available in the HTML
+          const lastUpdated = new Date().toISOString();
 
           experiences.push({
             id: String(index),

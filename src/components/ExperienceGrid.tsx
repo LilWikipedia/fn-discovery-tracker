@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { fetchDiscovery } from "@/hooks/fetchDiscovery";
+import { useFetchDiscovery } from "@/hooks/fetchDiscovery";
 import { Search } from "lucide-react";
 import { useMemo, useState } from 'react';
 
@@ -14,7 +14,7 @@ interface Experience {
 }
 
 const ExperienceGrid = () => {
-  const { data: DiscoveryData, isLoading, error } = fetchDiscovery();
+  const { data: DiscoveryData, isLoading, error } = useFetchDiscovery();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Experience;
@@ -30,7 +30,8 @@ const ExperienceGrid = () => {
 
 
   const sortedData = useMemo(() => {
-    let filtered = [];
+    let filtered = DiscoveryData || [];
+
     
     if (searchTerm) {
       filtered = filtered.filter(item =>
