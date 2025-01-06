@@ -24,7 +24,7 @@ export function useFetchDiscovery(): FetchDiscoveryResult {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('https://fortnite.gg/discover');
+        const response = await axios.get('/api/discover');
         const html = response.data;
         const $ = cheerio.load(html); // Load HTML with Cheerio
 
