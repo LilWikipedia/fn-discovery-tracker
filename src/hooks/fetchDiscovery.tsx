@@ -1,6 +1,5 @@
-
 import axios from 'axios';
-import { JSDOM } from 'jsdom';
+import * as cheerio from 'cheerio';
 import { useEffect, useState } from 'react';
 
 interface Experience {
@@ -27,17 +26,13 @@ export function useFetchDiscovery(): FetchDiscoveryResult {
       try {
         const response = await axios.get('https://fortnite.gg/discover');
         const html = response.data;
-        const dom = new JSDOM(html);
-        const document = dom.window.document;
+        const $ = cheerio.load(html); // Load HTML with Cheerio
 
         const experiences: Experience[] = [];
-        const islandElements = document.querySelectorAll('a[href^="/island?code="]');
-
-        islandElements.forEach((element, index) => {
-          const islandcode = element.getAttribute('href')?.split('=')[1] || '';
-          const islandtitle = element.querySelector('.island-title')?.textContent?.trim() || '';
-          const playersElement = element.querySelector('.players');
-          const playersText = playersElement?.textContent?.trim() || '0';
+        $('a[href^="/island?code="]').each((index, element) => {
+          const islandcode = $(element).attr('href')?.split('=')[1] || '';
+          const islandtitle = $(element).find('.island-title').text().trim() || '';
+          const playersText = $(element).find('.players').text().trim() || '0';
           const players = parseInt(playersText.replace(/,/g, ''), 10);
           const lastUpdated = new Date().toISOString();
 
@@ -46,7 +41,7 @@ export function useFetchDiscovery(): FetchDiscoveryResult {
             islandcode,
             islandtitle,
             players: isNaN(players) ? 0 : players,
-            lastUpdated
+            lastUpdated,
           });
         });
 

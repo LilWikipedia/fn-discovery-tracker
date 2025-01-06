@@ -6,7 +6,7 @@ const Index = () => {
       <header className="border-b border-muted py-4">
         <div className="container">
           <h1 className="text-2xl font-bold text-primary">FN Discovery</h1>
-          <p className="text-muted-foreground">Track and analyze experiences in real-time</p>
+          <p className="text-muted-foreground">Track and analyze experiences in Fortnite's 'Discovery'</p>
         </div>
       </header>
       <main className="py-8">
