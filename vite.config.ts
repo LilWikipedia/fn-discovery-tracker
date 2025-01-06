@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => ({
     proxy: {
       // Proxy /api requests to the target website
       '/api': {
-        target: 'https://fortnite.gg',
+        target: 'https://fortnite.gg/discovery',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''), // Removes /api prefix
         headers: {
