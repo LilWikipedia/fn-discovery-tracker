@@ -16,7 +16,7 @@ export const FetchDiscovery = () => {
   useEffect(() => {
     const fetchDiscoveryData = async () => {
       try {
-        const response = await fetch('http://localhost:5001/api/discovery'); // Backend API URL
+        const response = await fetch('./src/backend/data/fortnite_ugc_content.json'); // Backend API URL
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
