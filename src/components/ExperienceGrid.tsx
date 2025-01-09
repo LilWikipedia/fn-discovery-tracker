@@ -1,11 +1,11 @@
 import { Input } from "@/components/ui/input";
-import { FetchDiscovery } from "@/hooks/fetchDiscovery";
+import { FetchDiscovery } from "@/hooks/usefetchDiscovery";
 import { Search } from "lucide-react";
 import { useMemo, useState } from 'react';
 
 
 
-interface Experience {
+interface Experiences {
   
   islandtitle: string;
   players: number;
@@ -16,11 +16,11 @@ const ExperienceGrid = () => {
   const { data: DiscoveryData, isLoading, error } = FetchDiscovery();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof Experience;
+    key: keyof Experiences;
     direction: 'asc' | 'desc';
   } | null>(null);
 
-  const handleSort = (key: keyof Experience) => {
+  const handleSort = (key: keyof Experiences) => {
     setSortConfig(current => ({
       key,
       direction: current?.key === key && current.direction === 'asc' ? 'desc' : 'asc'
@@ -99,7 +99,7 @@ const ExperienceGrid = () => {
           </thead>
           <tbody>
             {sortedData.map((experience) => (
-              <tr key={experience.id} className="hover:bg-muted/50 transition-colors">
+              <tr key={experience.islandtitle} className="hover:bg-muted/50 transition-colors">
 
                 <td className="grid-cell">{experience.islandtitle}</td>
                 <td className="grid-cell text-right font-mono">{experience.players.toLocaleString()}</td>

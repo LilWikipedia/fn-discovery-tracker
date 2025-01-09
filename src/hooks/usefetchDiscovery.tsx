@@ -1,5 +1,13 @@
 import { useState, useEffect } from 'react';
 
+
+interface Experience {
+  
+  islandtitle: string;
+  players: number;
+  
+}
+
 export const FetchDiscovery = () => {
   const [data, setData] = useState<Experience[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -8,7 +16,7 @@ export const FetchDiscovery = () => {
   useEffect(() => {
     const fetchDiscoveryData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/discovery'); // Backend API URL
+        const response = await fetch('http://localhost:5001/api/discovery'); // Backend API URL
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
