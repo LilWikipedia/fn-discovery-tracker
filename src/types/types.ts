@@ -5,3 +5,9 @@ export interface DiscoveryData {
     players: string;
   }
   
+  export interface Experience {
+    
+    islandtitle: string;
+    players: string;
+  }
+  

@@ -1,20 +1,19 @@
 import { Input } from "@/components/ui/input";
-import { useFetchDiscovery } from "@/hooks/fetchDiscovery";
+import { FetchDiscovery } from "@/hooks/fetchDiscovery";
 import { Search } from "lucide-react";
 import { useMemo, useState } from 'react';
 
 
 
 interface Experience {
-  id: string;
-  islandcode: string;
+  
   islandtitle: string;
   players: number;
-  lastUpdated: string;
+  
 }
 
 const ExperienceGrid = () => {
-  const { data: DiscoveryData, isLoading, error } = useFetchDiscovery();
+  const { data: DiscoveryData, isLoading, error } = FetchDiscovery();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Experience;
@@ -82,12 +81,7 @@ const ExperienceGrid = () => {
           <thead>
             <tr className="bg-secondary">
 
-              <th 
-                className="grid-header cursor-pointer"
-                onClick={() => handleSort('islandcode')}
-              >
-                islandcode
-              </th>
+
               <th 
                 className="grid-header cursor-pointer"
                 onClick={() => handleSort('islandtitle')}
@@ -100,21 +94,16 @@ const ExperienceGrid = () => {
               >
                 players
               </th>
-              <th 
-                className="grid-header cursor-pointer"
-                onClick={() => handleSort('lastUpdated')}
-              >
-                Last Updated
-              </th>
+
             </tr>
           </thead>
           <tbody>
             {sortedData.map((experience) => (
               <tr key={experience.id} className="hover:bg-muted/50 transition-colors">
-                <td className="grid-cell">{experience.islandcode}</td>
+
                 <td className="grid-cell">{experience.islandtitle}</td>
                 <td className="grid-cell text-right font-mono">{experience.players.toLocaleString()}</td>
-                <td className="grid-cell font-mono">{experience.lastUpdated}</td>
+    
               </tr>
             ))}
           </tbody>
